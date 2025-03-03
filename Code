@@ -1,0 +1,160 @@
+#include <iostream>
+#include <vector>
+#include <limits>
+using namespace std;
+
+// Функція отримання масиву від користувача
+vector<int> arrayFromUser(int& n) {
+    Step1:
+    cout << "Введіть кількість елементів: ";
+    cin >> n;
+
+    if (cin.fail()) { // Перевірка на коректність введеного значення
+        cout << "\nКількість елементів повинна бути числом\n";
+        cin.clear();
+        cin.ignore();
+        goto Step1; // Повернення до введення
+    }
+
+    if (n <= 0) { // Перевірка на те, що n > 0
+        cout << "\nКількість елементів має бути більше нуля\n";
+        cin.clear();
+        cin.ignore();
+        goto Step1; // Повернення до введення
+    }
+
+    cout << "Введіть елементи масиву: ";
+    vector<int> arrayFromUser(n); // Ініціалізація вектора з n елементами
+    for (int i = 0; i < n; i++) {
+        cin >> arrayFromUser[i]; // Введення елементів масиву
+    }
+    return arrayFromUser; // Повернення вектора
+}
+
+// Функція для виведення масиву на екран
+void printArrayToConsole(vector<int> array) {
+    int n = array.size(); // Отримання розміру масиву
+    for (int i = 0; i < n; i++) {
+        cout << array[i] << " "; // Виведення кожного елемента
+    }
+    cout << "\n";
+}
+
+// Функція отримання значення k від користувача
+int kFromUser() {
+Step1:
+    cout << "Введіть на скільки елементів потрібно зсунути масив: ";
+    int k;
+    cin >> k;
+
+    if (cin.fail()) { // Перевірка на коректність введеного значення
+        cout << "\n\"k\" повинно бути числом\n";
+        cin.clear();
+        cin.ignore();
+        goto Step1; // Повернення до введення
+    }
+
+    if (k <= 0) { // Перевірка на те, що k > 0
+        cout << "\n\"k\" має бути більше нуля\n";
+        cin.clear();
+        cin.ignore();
+        goto Step1; // Повернення до введення
+    }
+
+    return k; // Повернення значення k
+}
+
+// Функція пошуку найбільшого локального мінімуму
+int findMaxLocalMinimum(vector<int>& arrWithNumbers, int& n) {
+    int maxLocalMin = -numeric_limits<int>::infinity(); // Початкове значення максимуму
+
+    for (int i = 0; i < n; ++i) {
+        // Перевірка для першого елемента
+        if (i == 0 && arrWithNumbers[i] < arrWithNumbers[i + 1] && arrWithNumbers[i] > maxLocalMin) {
+            maxLocalMin = arrWithNumbers[i];
+            continue;
+        }
+        // Перевірка для останнього елемента
+        if (i == n - 1 && arrWithNumbers[i] < arrWithNumbers[i - 1] && arrWithNumbers[i] > maxLocalMin) {
+            maxLocalMin = arrWithNumbers[i];
+            continue;
+        }
+        // Перевірка для внутрішніх елементів
+        if ((arrWithNumbers[i] < arrWithNumbers[i - 1] || arrWithNumbers[i] < arrWithNumbers[i + 1])
+            && arrWithNumbers[i] > maxLocalMin) {
+            maxLocalMin = arrWithNumbers[i];
+        }
+    }
+    return maxLocalMin; // Повернення найбільшого локального мінімуму
+}
+
+// Функція для виконання пошуку локального мінімуму
+void maxLocalMinimum() {
+    int n, maxLocalMin;
+    vector<int> array = arrayFromUser(n); // Отримання масиву від користувача
+    maxLocalMin = findMaxLocalMinimum(array, n); // Пошук найбільшого локального мінімуму
+
+    if (maxLocalMin == -numeric_limits<int>::infinity())
+        cout << "Локальних мінімумів не існує\n";
+    else
+        cout << "Найбільший локальний мінімум дорівнює: " << maxLocalMin << "\n";
+}
+
+// Функція для циклічного зсуву масиву вправо
+void cyclicShiftRight() {
+    int n, k;
+    vector<int> arrayWithNumbers = arrayFromUser(n); // Отримання масиву від користувача
+    k = kFromUser(); // Отримання значення k від користувача
+    vector<int> tempArray(k); // Допоміжний масив для збереження останніх k елементів
+
+    // Збереження останніх k елементів
+    for (int i = 0; i < k; i++) {
+        tempArray[i] = arrayWithNumbers[n - k + i];
+    }
+
+    // Зсув решти елементів вправо
+    for (int i = n - 1; i >= k; i--) {
+        arrayWithNumbers[i] = arrayWithNumbers[i - k];
+    }
+
+    // Вставка k елементів на початок
+    for (int i = 0; i < k; i++) {
+        arrayWithNumbers[i] = tempArray[i];
+    }
+
+    printArrayToConsole(arrayWithNumbers); // Виведення результату
+}
+
+// Головна функція програми
+int main() {
+Step1:
+    int choice;
+
+    // Виведення меню вибору
+    cout << "\nОберіть задачу для виконання:\n";
+    cout << "1. Пошук найбільшого локального мінімуму\n";
+    cout << "2. Зсув на k елементів вправо\n";
+    cout << "0. Вийти\n";
+    cout << "Ваш вибір: ";
+    cin >> choice;
+
+    // Обробка вибору користувача
+    switch (choice) {
+    case 1:
+        maxLocalMinimum(); // Виклик функції для пошуку локального мінімуму
+        goto Step1; // Повернення до меню
+        break;
+    case 2:
+        cyclicShiftRight(); // Виклик функції для зсуву масиву
+        goto Step1; // Повернення до меню
+        break;
+    case 0:
+        cout << "Вихід з програми.\n";
+        break;
+    default:
+        cout << "Некоректний вибір. Спробуйте ще раз.\n";
+        goto Step1; // Повернення до меню
+    }
+
+    return 0; // Завершення програми
+}
